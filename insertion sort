@@ -1,0 +1,46 @@
+#include <iostream>
+#include <string>
+using namespace std;
+struct Student {
+int rollNo;
+string name;
+float sgpa;
+};
+
+void insertionSort(Student arr[], int n) {
+int i, j;
+Student key;
+for (i = 1; i < n; i++) {
+key = arr[i];
+j = i - 1;
+
+while (j >= 0 && arr[j].name > key.name) {
+arr[j + 1] = arr[j];
+j = j - 1;
+}
+arr[j + 1] = key;
+}
+}
+
+void printStudentList(Student arr[], int n) {
+cout << "Student List (Sorted by Name):\n";
+cout << "-------------------------------------\n";
+cout << "Roll No\tName\tSGPA\n";
+cout << "-------------------------------------\n";
+for (int i = 0; i < n; i++) {
+cout << arr[i].rollNo << "\t" << arr[i].name << "\t" << arr[i].sgpa << "\n";
+}
+}
+int main() {
+
+const int n = 5;  
+
+Student students[n] = {
+{101, "Alice", 3.8}, {103, "Bob", 3.5}, {102, "Charlie", 3.2}, {105, "David", 3.9}, {104, "Eve", 3.6}
+};
+
+insertionSort(students, n);
+
+printStudentList(students, n);
+return 0;
+}
