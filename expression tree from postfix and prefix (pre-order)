@@ -1,0 +1,114 @@
+#include <iostream>
+#include <stack>
+#include <cctype>
+
+using namespace std;
+
+struct TreeNode {
+    char data;
+    TreeNode* left;
+    TreeNode* right;
+
+    TreeNode(char value) : data(value), left(nullptr), right(nullptr) {}
+};
+
+bool isOperator(char c) {
+    return (c == '+' || c == '-' || c == '*' || c == '/');
+}
+
+TreeNode* constructExpressionTreeFromPostfix(const string& postfix) {
+    stack<TreeNode*> st;
+
+    for (char c : postfix) {
+        if (isalnum(c)) {  // Operand
+            st.push(new TreeNode(c));
+        } else if (isOperator(c)) {  // Operator
+            TreeNode* operand2 = st.top(); st.pop();
+            TreeNode* operand1 = st.top(); st.pop();
+            TreeNode* newNode = new TreeNode(c);
+            newNode->left = operand1;
+            newNode->right = operand2;
+            st.push(newNode);
+        }
+    }
+
+    return st.top();
+}
+
+TreeNode* constructExpressionTreeFromPrefix(const string& prefix) {
+    stack<TreeNode*> st;
+
+    for (int i = prefix.size() - 1; i >= 0; --i) {
+        char c = prefix[i];
+
+        if (isalnum(c)) {  // Operand
+            st.push(new TreeNode(c));
+        } else if (isOperator(c)) {  // Operator
+            TreeNode* operand1 = st.top(); st.pop();
+            TreeNode* operand2 = st.top(); st.pop();
+            TreeNode* newNode = new TreeNode(c);
+            newNode->left = operand1;
+            newNode->right = operand2;
+            st.push(newNode);
+        }
+    }
+
+    return st.top();
+}
+
+void recursivePreOrderTraversal(TreeNode* root) {
+    if (root) {
+        cout << root->data << " ";
+        recursivePreOrderTraversal(root->left);
+        recursivePreOrderTraversal(root->right);
+    }
+}
+
+void nonRecursivePreOrderTraversal(TreeNode* root) {
+    stack<TreeNode*> st;
+    st.push(root);
+
+    while (!st.empty()) {
+        TreeNode* current = st.top(); st.pop();
+        cout << current->data << " ";
+
+        if (current->right) {
+            st.push(current->right);
+        }
+        if (current->left) {
+            st.push(current->left);
+        }
+    }
+}
+
+int main() {
+    string postfix, prefix;
+
+    cout << "Enter postfix expression: ";
+    cin >> postfix;
+
+    TreeNode* postfixRoot = constructExpressionTreeFromPostfix(postfix);
+
+    cout << "Recursive Pre-order traversal of postfix expression tree: ";
+    recursivePreOrderTraversal(postfixRoot);
+    cout << endl;
+
+    cout << "Non-recursive Pre-order traversal of postfix expression tree: ";
+    nonRecursivePreOrderTraversal(postfixRoot);
+    cout << endl;
+
+    cout << "Enter prefix expression: ";
+    cin >> prefix;
+
+    TreeNode* prefixRoot = constructExpressionTreeFromPrefix(prefix);
+
+    cout << "Recursive Pre-order traversal of prefix expression tree: ";
+    recursivePreOrderTraversal(prefixRoot);
+    cout << endl;
+
+    cout << "Non-recursive Pre-order traversal of prefix expression tree: ";
+    nonRecursivePreOrderTraversal(prefixRoot);
+    cout << endl;
+
+    return 0;
+}
