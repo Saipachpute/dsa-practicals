@@ -1,0 +1,115 @@
+#include <iostream>
+using namespace std;
+// Node structure for the Binary Search Tree
+struct Node {
+int key;
+Node* left;
+Node* right;
+Node(int value) : key(value), left(nullptr), right(nullptr) {}
+};
+// Binary Search Tree class
+class BinarySearchTree {
+private:
+Node* root;
+// Private helper functions
+Node* insertRecursive(Node* current, int key);
+Node* deleteRecursive(Node* current, int key);
+Node* findMin(Node* node);
+void inorderTraversalRecursive(Node* node);
+public:
+BinarySearchTree() : root(nullptr) {}
+// Public functions
+void insert(int key);
+void remove(int key);
+void displayInorder();
+};
+// Insert a key into the BST (handles duplicate entries)
+Node* BinarySearchTree::insertRecursive(Node* current, int key) {
+if (current == nullptr) {
+return new Node(key);
+}
+if (key < current->key) {
+current->left = insertRecursive(current->left, key);
+} else if (key > current->key) {
+current->right = insertRecursive(current->right, key);
+} else {
+// Duplicate key, do nothing (or handle as needed)
+}
+return current;
+}
+// Delete a key from the BST
+Node* BinarySearchTree::deleteRecursive(Node* current, int key) {
+if (current == nullptr) {
+return current;
+}
+if (key < current->key) {
+current->left = deleteRecursive(current->left, key);
+} else if (key > current->key) {
+current->right = deleteRecursive(current->right, key);
+} else {
+// Node with only one child or no child
+if (current->left == nullptr) {
+Node* temp = current->right;
+delete current;
+return temp;
+} else if (current->right == nullptr) {
+Node* temp = current->left;
+delete current;
+return temp;
+}
+// Node with two children, get the inorder successor (smallest in the right subtree)
+Node* temp = findMin(current->right);
+// Copy the inorder successor's value to this node
+current->key = temp->key;
+// Delete the inorder successor
+current->right = deleteRecursive(current->right, temp->key);
+}
+return current;
+}
+// Find the node with the minimum key value in the BST
+Node* BinarySearchTree::findMin(Node* node) {
+while (node->left != nullptr) {
+node = node->left;
+}
+return node;
+}
+// Display the BST using inorder traversal
+void BinarySearchTree::inorderTraversalRecursive(Node* node) {
+if (node != nullptr) {
+inorderTraversalRecursive(node->left);
+cout << node->key << " ";
+inorderTraversalRecursive(node->right);
+}
+}
+// Public function to insert a key into the BST
+void BinarySearchTree::insert(int key) {
+root = insertRecursive(root, key);
+}
+// Public function to remove a key from the BST
+void BinarySearchTree::remove(int key) {
+root = deleteRecursive(root, key);
+}
+// Public function to display the BST using inorder traversal
+void BinarySearchTree::displayInorder() {
+cout << "Inorder Traversal: ";
+inorderTraversalRecursive(root);
+cout << endl;
+}
+int main() {
+BinarySearchTree bst;
+// Insert keys into the BST
+bst.insert(50);
+bst.insert(30);
+bst.insert(70);
+bst.insert(20);
+bst.insert(40);
+bst.insert(60);
+bst.insert(80);
+// Display the BST
+bst.displayInorder();
+// Remove a key from the BST
+bst.remove(30);
+// Display the BST after removal
+bst.displayInorder();
+return 0;
+}
