@@ -1,0 +1,142 @@
+#include <iostream>
+#include <stack>
+#include <cctype>
+
+using namespace std;
+
+struct Node {
+    char data;
+    Node* left;
+    Node* right;
+
+    Node(char val) : data(val), left(nullptr), right(nullptr) {}
+};
+
+class ExpressionTree {
+private:
+    Node* root;
+
+    bool isOperator(char c) {
+        return (c == '+' || c == '-' || c == '*' || c == '/');
+    }
+
+    void buildTreeFromPostfix(const string& postfix) {
+        stack<Node*> st;
+
+        for (char c : postfix) {
+            if (isalnum(c)) {
+                st.push(new Node(c));
+            } else if (isOperator(c)) {
+                Node* operand2 = st.top(); st.pop();
+                Node* operand1 = st.top(); st.pop();
+                Node* newNode = new Node(c);
+                newNode->left = operand1;
+                newNode->right = operand2;
+                st.push(newNode);
+            }
+        }
+
+        root = st.top();
+    }
+
+    void buildTreeFromPrefix(const string& prefix) {
+        stack<Node*> st;
+
+        for (int i = prefix.length() - 1; i >= 0; --i) {
+            char c = prefix[i];
+            if (isalnum(c)) {
+                st.push(new Node(c));
+            } else if (isOperator(c)) {
+                Node* operand1 = st.top(); st.pop();
+                Node* operand2 = st.top(); st.pop();
+                Node* newNode = new Node(c);
+                newNode->left = operand1;
+                newNode->right = operand2;
+                st.push(newNode);
+            }
+        }
+
+        root = st.top();
+    }
+
+    void recursivePostOrderTraversal(Node* current) {
+        if (current) {
+            recursivePostOrderTraversal(current->left);
+            recursivePostOrderTraversal(current->right);
+            cout << current->data << " ";
+        }
+    }
+
+    void nonRecursivePostOrderTraversal() {
+        stack<Node*> st;
+        Node* current = root;
+        Node* lastVisited = nullptr;
+
+        while (current || !st.empty()) {
+            if (current) {
+                st.push(current);
+                current = current->left;
+            } else {
+                Node* peekNode = st.top();
+                if (peekNode->right && lastVisited != peekNode->right) {
+                    current = peekNode->right;
+                } else {
+                    cout << peekNode->data << " ";
+                    lastVisited = st.top();
+                    st.pop();
+                }
+            }
+        }
+    }
+
+public:
+    ExpressionTree() : root(nullptr) {}
+
+    void constructTreeFromPostfixExpression(const string& postfix) {
+        buildTreeFromPostfix(postfix);
+    }
+
+    void constructTreeFromPrefixExpression(const string& prefix) {
+        buildTreeFromPrefix(prefix);
+    }
+
+    void displayPostOrderRecursive() {
+        recursivePostOrderTraversal(root);
+        cout << endl;
+    }
+
+    void displayPostOrderNonRecursive() {
+        nonRecursivePostOrderTraversal();
+        cout << endl;
+    }
+};
+
+int main() {
+    ExpressionTree tree;
+
+    string postfixExpression, prefixExpression;
+
+    cout << "Enter postfix expression: ";
+    cin >> postfixExpression;
+    tree.constructTreeFromPostfixExpression(postfixExpression);
+
+    cout << "Post-order traversal (recursive): ";
+    tree.displayPostOrderRecursive();
+
+    cout << "Post-order traversal (non-recursive): ";
+    tree.displayPostOrderNonRecursive();
+
+    cout << endl;
+
+    cout << "Enter prefix expression: ";
+    cin >> prefixExpression;
+    tree.constructTreeFromPrefixExpression(prefixExpression);
+
+    cout << "Post-order traversal (recursive): ";
+    tree.displayPostOrderRecursive();
+
+    cout << "Post-order traversal (non-recursive): ";
+    tree.displayPostOrderNonRecursive();
+
+    return 0;
+}
