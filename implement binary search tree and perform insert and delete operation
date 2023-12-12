@@ -1,0 +1,115 @@
+#include <iostream>
+
+struct TreeNode {
+    int data;
+    TreeNode* left;
+    TreeNode* right;
+
+    TreeNode(int value) : data(value), left(nullptr), right(nullptr) {}
+};
+
+TreeNode* insert(TreeNode* root, int key) {
+    if (!root) {
+        return new TreeNode(key);
+    }
+
+    if (key < root->data) {
+        root->left = insert(root->left, key);
+    } else if (key > root->data) {
+        root->right = insert(root->right, key);
+    }
+
+    // Handle duplicate entries (optional)
+    // else {
+    //     // Handle duplicate entry logic here
+    // }
+
+    return root;
+}
+
+TreeNode* findMin(TreeNode* node) {
+    while (node->left) {
+        node = node->left;
+    }
+    return node;
+}
+
+TreeNode* deleteNode(TreeNode* root, int key) {
+    if (!root) {
+        return root;
+    }
+
+    if (key < root->data) {
+        root->left = deleteNode(root->left, key);
+    } else if (key > root->data) {
+        root->right = deleteNode(root->right, key);
+    } else {
+        if (!root->left) {
+            TreeNode* temp = root->right;
+            delete root;
+            return temp;
+        } else if (!root->right) {
+            TreeNode* temp = root->left;
+            delete root;
+            return temp;
+        }
+
+        TreeNode* temp = findMin(root->right);
+        root->data = temp->data;
+        root->right = deleteNode(root->right, temp->data);
+    }
+
+    return root;
+}
+
+void inOrderTraversal(TreeNode* root) {
+    if (root) {
+        inOrderTraversal(root->left);
+        std::cout << root->data << " ";
+        inOrderTraversal(root->right);
+    }
+}
+
+int main() {
+    TreeNode* root = nullptr;
+    char choice;
+
+    do {
+        std::cout << "Choose operation: \n";
+        std::cout << "a) Insert\n";
+        std::cout << "b) Delete\n";
+        std::cout << "c) Print In-order Traversal\n";
+        std::cout << "d) Exit\n";
+        std::cout << "Enter choice: ";
+        std::cin >> choice;
+
+        switch (choice) {
+            case 'a': {
+                int key;
+                std::cout << "Enter value to insert: ";
+                std::cin >> key;
+                root = insert(root, key);
+                break;
+            }
+            case 'b': {
+                int key;
+                std::cout << "Enter value to delete: ";
+                std::cin >> key;
+                root = deleteNode(root, key);
+                break;
+            }
+            case 'c':
+                std::cout << "In-order Traversal: ";
+                inOrderTraversal(root);
+                std::cout << "\n";
+                break;
+            case 'd':
+                std::cout << "Exiting program.\n";
+                break;
+            default:
+                std::cout << "Invalid choice. Try again.\n";
+        }
+    } while (choice != 'd');
+
+    return 0;
+}
